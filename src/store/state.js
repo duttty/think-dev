@@ -1,6 +1,10 @@
 // https://vuex.vuejs.org/en/state.html
 
 export default {
+  // mqtt
+
+  mqclient: '',
+  taskID: 0,
   // 原始部分
   barColor: 'rgba(0, 0, 0, .8), rgba(0, 0, 0, .8)',
   barImage:

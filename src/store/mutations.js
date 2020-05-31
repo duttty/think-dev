@@ -1,6 +1,11 @@
 // https://vuex.vuejs.org/en/mutations.html
 
 export default {
+  // mqtt
+
+  setMqtt(state, payload) {
+    state.mqclient = payload
+  },
   // 原始部分
 
   SET_BAR_IMAGE(state, payload) {

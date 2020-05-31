@@ -31,7 +31,9 @@
                   <div class="i">
                     当前值：54
                   </div>
-                  <div class="r"><v-icon>mdi-arrow-up</v-icon>38%</div>
+                  <div class="r">
+                    <v-icon>mdi-arrow-up</v-icon>38%
+                  </div>
                 </div>
               </div>
               <div class="chart_wrap chart_wrap1">
@@ -204,9 +206,7 @@
                               class="display-3 font-weight-light"
                               v-text="bpm"
                             />
-                            <span class="subheading font-weight-light mr-1"
-                              >℃</span
-                            >
+                            <span class="subheading font-weight-light mr-1">℃</span>
                             <v-fade-transition>
                               <v-avatar
                                 v-if="isPlaying"
@@ -352,7 +352,7 @@
         <div class="item_content">
           <div
             class="image"
-            style='background-image: url("http://akveo.com/ngx-admin/assets/images/cover2.jpg"); background-position: center center;'
+            style="background-image: url(&quot;http://akveo.com/ngx-admin/assets/images/cover2.jpg&quot;); background-position: center center;"
           />
           <div class="title">
             Miusic - name
@@ -392,6 +392,7 @@
 <script>
 // import QRCode from 'qrcode';
 import echartMixins from '@/mixins/echart-settings'
+import mqtt from 'mqtt'
 
 export default {
   mixins: [echartMixins],
@@ -466,8 +467,42 @@ export default {
   mounted() {
     this.$vuetify.theme.themes.light.primary = '#323259'
     // this.$store.commit('handleSetColor', '#323259')
+    this.mqttStart()
   },
   methods: {
+    // mqtt
+    // 建立连接
+    mqttStart() {
+      if (this.$store.state.mqclient) {
+        return this.$store.state.mqclient
+      }
+      const client = mqtt.connect('ws://duttty.top:8083/mqtt', {
+        clientId: 'dashboard'
+      })
+      client.on('connect', () => {
+        client.subscribe('dt/80123456/data', { qos: 0 })
+        this.$store.commit('setMqtt', client)
+      })
+
+      // 问询温度
+      setInterval(() => {
+        client.publish('dt/80123456/query', '010300000002')
+        console.log('send ok')
+      }, 3000)
+      client.on('message', (topic, message) => {
+        console.log('received message: ', message.toString())
+        const str = message.toString().slice(8, 12)
+        const data = (parseInt(str, 16) / 1000).toFixed(1)
+
+        this.roomTemp.rows[0].value = data
+      })
+
+      client.on('error', () => {
+        this.$store.state.mqtt = ''
+        console.log('mqtt err')
+      })
+      return client
+    },
     // new
     changeType() {
       this.index++
