@@ -190,7 +190,7 @@
           <v-img
             class="white--text align-end"
             height="200px"
-            src="https://bing.ioliu.cn/v1?w=320&h=240"
+            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
           >
             <v-card-title>
               操作说明
